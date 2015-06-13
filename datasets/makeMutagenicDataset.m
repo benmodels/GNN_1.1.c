@@ -8,7 +8,7 @@ function makeMutagenicDataset(file)
 % We thank Derek Monner to have shown us the problem.
 
 
-the Procedure  procedure 
+% the Procedure  procedure 
 addpath(genpath(pwd));
 
 global dataSet tmp gr multidata testIndexes trainIndexes validationIndexes
@@ -44,7 +44,6 @@ file='muta.pl';
     numline=1;
     line = fgetl(fid);
     while feof(fid) == 0
-        numline
     %for ttt=1:2
         if isempty(line)
             err(numline, 'line is empty. Please remove it');
