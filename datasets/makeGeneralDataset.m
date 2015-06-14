@@ -227,5 +227,5 @@ end
 
 cd(origDir)
 t=cputime-t;
-message(['Added to ' (set) ' ' num2str(dataSet.(set).graphNum) ' graphs (' num2str(dataSet.(set).nNodes) ' nodes, ' num2str(size(dataSet.(set).edgeLabels,2)) ' edges) in ' num2str(t) 's.']);
+mssg(['Added to ' (set) ' ' num2str(dataSet.(set).graphNum) ' graphs (' num2str(dataSet.(set).nNodes) ' nodes, ' num2str(size(dataSet.(set).edgeLabels,2)) ' edges) in ' num2str(t) 's.']);
 

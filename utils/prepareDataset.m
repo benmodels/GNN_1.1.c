@@ -3,7 +3,7 @@ function prepareDataset(set)
 %optimizing
 global dataSet dynamicSystem
 if strcmp(dynamicSystem.config.type,'neural')
-    message(['Preparing the ' set '...'])
+    mssg(['Preparing the ' set '...'])
     E=speye(dynamicSystem.config.nStates);
     [dataSet.(set).neuralModel.childOfArc,dataSet.(set).neuralModel.fatherOfArc]=find(dataSet.(set).connMatrix);
     dataSet.(set).nArcs=size(dataSet.(set).neuralModel.childOfArc,1);

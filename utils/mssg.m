@@ -1,4 +1,4 @@
-function message(msg)
+function mssg(msg)
 global dynamicSystem
 
 printScreen=1;

@@ -116,33 +116,33 @@ if  strcmp(dataSet.config.type,'classification')
 
 
     %display the results
-    message('-----------------------------------------------------------------------------');
-    message('OPTIMAL');
-    message([sprintf('Classification Accuracy on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.optimal.accuracy*100) '%'])
+    mssg('-----------------------------------------------------------------------------');
+    mssg('OPTIMAL');
+    mssg([sprintf('Classification Accuracy on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.optimal.accuracy*100) '%'])
     if isfield(dataSet.config,'graphDim')&&dataSet.trainSet.graphNum > 1
-        message([sprintf('Classification AccuracyOnGraphs on trainSet:\t') num2str(comparisonNetTesting.trainSet.optimal.accuracyOnGraphs*100) '%'])
+        mssg([sprintf('Classification AccuracyOnGraphs on trainSet:\t') num2str(comparisonNetTesting.trainSet.optimal.accuracyOnGraphs*100) '%'])
     end
-    message([sprintf('Train error: \t\t\t\t\t') num2str(comparisonNetTesting.trainSet.optimal.error)])
-    message(' ');
-   message([sprintf('Classification Accuracy on testSet:\t\t') num2str(comparisonNetTesting.testSet.optimal.accuracy*100) '%'])
+    mssg([sprintf('Train error: \t\t\t\t\t') num2str(comparisonNetTesting.trainSet.optimal.error)])
+    mssg(' ');
+   mssg([sprintf('Classification Accuracy on testSet:\t\t') num2str(comparisonNetTesting.testSet.optimal.accuracy*100) '%'])
     if isfield(dataSet.config,'graphDim')&&dataSet.trainSet.graphNum > 1
-        message([sprintf('Classification AccuracyOnGraphs on testSet:\t') num2str(comparisonNetTesting.testSet.optimal.accuracyOnGraphs*100) '%'])
+        mssg([sprintf('Classification AccuracyOnGraphs on testSet:\t') num2str(comparisonNetTesting.testSet.optimal.accuracyOnGraphs*100) '%'])
     end
-    message([sprintf('Test error: \t\t\t\t\t') num2str(comparisonNetTesting.testSet.optimal.error)])
-    message('-----------------------------------------------------------------------------');
-    message('CURRENT');
-    message([sprintf('Classification Accuracy on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.current.accuracy*100) '%'])
+    mssg([sprintf('Test error: \t\t\t\t\t') num2str(comparisonNetTesting.testSet.optimal.error)])
+    mssg('-----------------------------------------------------------------------------');
+    mssg('CURRENT');
+    mssg([sprintf('Classification Accuracy on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.current.accuracy*100) '%'])
     if isfield(dataSet.config,'graphDim')&&dataSet.trainSet.graphNum > 1
-        message([sprintf('Classification AccuracyOnGraphs on trainSet:\t') num2str(comparisonNetTesting.trainSet.current.accuracyOnGraphs*100) '%'])
+        mssg([sprintf('Classification AccuracyOnGraphs on trainSet:\t') num2str(comparisonNetTesting.trainSet.current.accuracyOnGraphs*100) '%'])
     end
-    message([sprintf('Train error: \t\t\t\t\t') num2str(comparisonNetTesting.trainSet.current.error)])
-      message(' ');
-    message([sprintf('Classification Accuracy on testSet:\t\t') num2str(comparisonNetTesting.testSet.current.accuracy*100) '%'])
+    mssg([sprintf('Train error: \t\t\t\t\t') num2str(comparisonNetTesting.trainSet.current.error)])
+      mssg(' ');
+    mssg([sprintf('Classification Accuracy on testSet:\t\t') num2str(comparisonNetTesting.testSet.current.accuracy*100) '%'])
     if isfield(dataSet.config,'graphDim')&&dataSet.trainSet.graphNum > 1
-        message([sprintf('Classification AccuracyOnGraphs on testSet:\t') num2str(comparisonNetTesting.testSet.current.accuracyOnGraphs*100) '%'])
+        mssg([sprintf('Classification AccuracyOnGraphs on testSet:\t') num2str(comparisonNetTesting.testSet.current.accuracyOnGraphs*100) '%'])
     end
-    message([sprintf('Test error: \t\t\t\t\t') num2str(comparisonNetTesting.testSet.current.error)])
-    message('-----------------------------------------------------------------------------');
+    mssg([sprintf('Test error: \t\t\t\t\t') num2str(comparisonNetTesting.testSet.current.error)])
+    mssg('-----------------------------------------------------------------------------');
 else
     %trainSet optimal
     comparisonNetTesting.trainSet.optimal.maxRelativeError=max(abs(comparisonNetTesting.trainSet.optimal.delta(supervisedNodesTrain) ./ dataSet.trainSet.targets(supervisedNodesTrain)));
@@ -170,31 +170,31 @@ else
 
     
     %display the results
-    message(sprintf('\n----------------------------------------'));
-    message(sprintf('OPTIMAL'));
-    message([sprintf('Error on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.optimal.error)])
-    message([sprintf('maxError on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.optimal.maxError)])
-    message([sprintf('maxRelativeError on trainSet:\t') num2str(comparisonNetTesting.trainSet.optimal.maxRelativeError)])
-    message([sprintf('err < 0.05:\t\t\t') num2str(comparisonNetTesting.trainSet.optimal.acc5percent*100,'%4.2f') '%'])
-    message([sprintf('err < 0.1:\t\t\t') num2str(comparisonNetTesting.trainSet.optimal.acc10percent*100,'%4.2f') '%'])
-    message(' ');
-    message([sprintf('Error on testSet:\t\t') num2str(comparisonNetTesting.testSet.optimal.error)])
-    message([sprintf('maxError on testSet:\t\t') num2str(comparisonNetTesting.testSet.optimal.maxError)])
-    message([sprintf('maxRelativeError on testSet:\t') num2str(comparisonNetTesting.testSet.optimal.maxRelativeError)])
-    message([sprintf('err < 0.05:\t\t\t') num2str(comparisonNetTesting.testSet.optimal.acc5percent*100,'%4.2f') '%'])
-    message([sprintf('err < 0.1:\t\t\t') num2str(comparisonNetTesting.testSet.optimal.acc10percent*100,'%4.2f') '%'])
-    message(sprintf('\n----------------------------------------'));
-    message(sprintf('CURRENT'));
-    message([sprintf('Error on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.current.error)])
-    message([sprintf('maxError on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.current.maxError)])
-    message([sprintf('maxRelativeError on trainSet:\t') num2str(comparisonNetTesting.trainSet.current.maxRelativeError)])
-    message([sprintf('err < 0.05:\t\t\t') num2str(comparisonNetTesting.trainSet.current.acc5percent*100,'%4.2f') '%'])
-    message([sprintf('err < 0.1:\t\t\t') num2str(comparisonNetTesting.trainSet.current.acc10percent*100,'%4.2f') '%'])
-    message(' ');
-    message([sprintf('Error on testSet:\t\t') num2str(comparisonNetTesting.testSet.current.error)])
-    message([sprintf('maxError on testSet:\t\t') num2str(comparisonNetTesting.testSet.current.maxError)])
-    message([sprintf('maxRelativeError on testSet:\t') num2str(comparisonNetTesting.testSet.current.maxRelativeError)])
-    message([sprintf('err < 0.05:\t\t\t') num2str(comparisonNetTesting.testSet.current.acc5percent*100,'%4.2f') '%'])
-    message([sprintf('err < 0.1:\t\t\t') num2str(comparisonNetTesting.testSet.current.acc10percent*100,'%4.2f') '%'])
-    message(sprintf('----------------------------------------\n'));
+    mssg(sprintf('\n----------------------------------------'));
+    mssg(sprintf('OPTIMAL'));
+    mssg([sprintf('Error on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.optimal.error)])
+    mssg([sprintf('maxError on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.optimal.maxError)])
+    mssg([sprintf('maxRelativeError on trainSet:\t') num2str(comparisonNetTesting.trainSet.optimal.maxRelativeError)])
+    mssg([sprintf('err < 0.05:\t\t\t') num2str(comparisonNetTesting.trainSet.optimal.acc5percent*100,'%4.2f') '%'])
+    mssg([sprintf('err < 0.1:\t\t\t') num2str(comparisonNetTesting.trainSet.optimal.acc10percent*100,'%4.2f') '%'])
+    mssg(' ');
+    mssg([sprintf('Error on testSet:\t\t') num2str(comparisonNetTesting.testSet.optimal.error)])
+    mssg([sprintf('maxError on testSet:\t\t') num2str(comparisonNetTesting.testSet.optimal.maxError)])
+    mssg([sprintf('maxRelativeError on testSet:\t') num2str(comparisonNetTesting.testSet.optimal.maxRelativeError)])
+    mssg([sprintf('err < 0.05:\t\t\t') num2str(comparisonNetTesting.testSet.optimal.acc5percent*100,'%4.2f') '%'])
+    mssg([sprintf('err < 0.1:\t\t\t') num2str(comparisonNetTesting.testSet.optimal.acc10percent*100,'%4.2f') '%'])
+    mssg(sprintf('\n----------------------------------------'));
+    mssg(sprintf('CURRENT'));
+    mssg([sprintf('Error on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.current.error)])
+    mssg([sprintf('maxError on trainSet:\t\t') num2str(comparisonNetTesting.trainSet.current.maxError)])
+    mssg([sprintf('maxRelativeError on trainSet:\t') num2str(comparisonNetTesting.trainSet.current.maxRelativeError)])
+    mssg([sprintf('err < 0.05:\t\t\t') num2str(comparisonNetTesting.trainSet.current.acc5percent*100,'%4.2f') '%'])
+    mssg([sprintf('err < 0.1:\t\t\t') num2str(comparisonNetTesting.trainSet.current.acc10percent*100,'%4.2f') '%'])
+    mssg(' ');
+    mssg([sprintf('Error on testSet:\t\t') num2str(comparisonNetTesting.testSet.current.error)])
+    mssg([sprintf('maxError on testSet:\t\t') num2str(comparisonNetTesting.testSet.current.maxError)])
+    mssg([sprintf('maxRelativeError on testSet:\t') num2str(comparisonNetTesting.testSet.current.maxRelativeError)])
+    mssg([sprintf('err < 0.05:\t\t\t') num2str(comparisonNetTesting.testSet.current.acc5percent*100,'%4.2f') '%'])
+    mssg([sprintf('err < 0.1:\t\t\t') num2str(comparisonNetTesting.testSet.current.acc10percent*100,'%4.2f') '%'])
+    mssg(sprintf('----------------------------------------\n'));
 end

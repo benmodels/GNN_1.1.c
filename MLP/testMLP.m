@@ -51,10 +51,10 @@ smp=size(MLPTesting.testSet.mistakenPatternIndex,2);
 MLPTesting.testSet.accuracy=1-(smp/sizeTest);
 
 %display the results
-message('-----------------------------------------------------------------------------');
-message([sprintf('Classification Accuracy on trainSet:\t\t') num2str(MLPTesting.trainSet.accuracy*100) '%'])
-message([sprintf('Train error: \t\t\t\t\t') num2str(MLPTesting.trainSet.error)])
-message('---------------------------------------------');
-message([sprintf('Classification Accuracy on testSet:\t\t') num2str(MLPTesting.testSet.accuracy*100) '%'])
-message([sprintf('Test error: \t\t\t\t\t') num2str(MLPTesting.testSet.error)])
-message('-----------------------------------------------------------------------------');
+mssg('-----------------------------------------------------------------------------');
+mssg([sprintf('Classification Accuracy on trainSet:\t\t') num2str(MLPTesting.trainSet.accuracy*100) '%'])
+mssg([sprintf('Train error: \t\t\t\t\t') num2str(MLPTesting.trainSet.error)])
+mssg('---------------------------------------------');
+mssg([sprintf('Classification Accuracy on testSet:\t\t') num2str(MLPTesting.testSet.accuracy*100) '%'])
+mssg([sprintf('Test error: \t\t\t\t\t') num2str(MLPTesting.testSet.error)])
+mssg('-----------------------------------------------------------------------------');

@@ -7,7 +7,7 @@ if nargin==0
 end
 try
     saveAll(fname);
-    message([sprintf('\t\t\t') 'Autosaving completed']);
+    mssg([sprintf('\t\t\t') 'Autosaving completed']);
 catch
     [errstr, errid] = lasterr;
     warn(0,[sprintf('\t\t\t') 'Autosaving failed! Autosaving will be disabled' sprintf('\n\t') strrep(errstr,sprintf('\n'),sprintf('\t'))]);

@@ -242,7 +242,7 @@ catch
     else
         if size(strfind(msgstr,'Out of memory'),1)>0
             err(0,'Unrecoverable Out of memory error in test4classification. Too much memory needed?')
-            message('Leaving the data in dataerr.mat')
+            mssg('Leaving the data in dataerr.mat')
             system('mv data.mat dataerr.mat');
         else
             err(0,msgstr);

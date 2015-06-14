@@ -102,18 +102,18 @@ if VisualMode == 1
         testing.current.testSet.error,testing.current.testSet.acc5percent,testing.current.testSet.acc10percent,...
         testing.optimal.testSet.error,testing.optimal.testSet.acc5percent,testing.optimal.testSet.acc10percent);
 else
-    message(sprintf('\n\t\t\tTESTSET\t\t\t\t\tTRAINSET'));
-    message(sprintf('--------------------------------------------------------------------------------------'));
-    message([sprintf('\t\t| Error: \t\t') num2str(testing.optimal.testSet.error,'%10.5g') sprintf('\t\tError: \t\t\t') num2str(testing.optimal.trainSet.error,'%10.5g')]);
-    message([sprintf('\t\t| maxError: \t\t') num2str(testing.optimal.testSet.maxError,'%10.5g') sprintf('\t\tmaxError: \t\t') num2str(testing.optimal.trainSet.maxError,'%10.5g')]);
-    message([sprintf('OPTIMAL\t\t| maxRelativeError: \t') num2str(testing.optimal.testSet.maxRelativeError,'%10.5g') sprintf('\t\tmaxRelativeError: \t') num2str(testing.optimal.trainSet.maxRelativeError,'%10.5g')]);
-    message([sprintf('\t\t| err < 0.05:\t\t') num2str(testing.optimal.testSet.acc5percent*100,'%4.2f') '%%' sprintf('\t\terr < 0.05:\t\t') num2str(testing.optimal.trainSet.acc5percent*100,'%4.2f') '%%']);
-    message([sprintf('\t\t| err < 0.1:\t\t') num2str(testing.optimal.testSet.acc10percent*100,'%4.2f') '%%' sprintf('\t\terr < 0.1:\t\t') num2str(testing.optimal.trainSet.acc10percent*100,'%4.2f') '%%']);
-    message(sprintf('\t\t|'));
-    message([sprintf('\t\t| Error: \t\t') num2str(testing.current.testSet.error,'%10.5g') sprintf('\t\tError: \t\t\t') num2str(testing.current.trainSet.error,'%10.5g')]);
-    message([sprintf('\t\t| maxError: \t\t') num2str(testing.current.testSet.maxError,'%10.5g') sprintf('\t\tmaxError: \t\t') num2str(testing.current.trainSet.maxError,'%10.5g')]);
-    message([sprintf('CURRENT\t\t| maxRelativeError: \t') num2str(testing.current.testSet.maxRelativeError,'%10.5g') sprintf('\t\tmaxRelativeError: \t') num2str(testing.current.trainSet.maxRelativeError,'%10.5g')]);
-    message([sprintf('\t\t| err < 0.05:\t\t') num2str(testing.current.testSet.acc5percent*100,'%4.2f') '%%' sprintf('\t\terr < 0.05:\t\t') num2str(testing.current.trainSet.acc5percent*100,'%4.2f') '%%']);
-    message([sprintf('\t\t| err < 0.1:\t\t') num2str(testing.current.testSet.acc10percent*100,'%4.2f') '%%' sprintf('\t\terr < 0.1:\t\t') num2str(testing.current.trainSet.acc10percent*100,'%4.2f') '%%']);
-    message(sprintf('--------------------------------------------------------------------------------------'));
+    mssg(sprintf('\n\t\t\tTESTSET\t\t\t\t\tTRAINSET'));
+    mssg(sprintf('--------------------------------------------------------------------------------------'));
+    mssg([sprintf('\t\t| Error: \t\t') num2str(testing.optimal.testSet.error,'%10.5g') sprintf('\t\tError: \t\t\t') num2str(testing.optimal.trainSet.error,'%10.5g')]);
+    mssg([sprintf('\t\t| maxError: \t\t') num2str(testing.optimal.testSet.maxError,'%10.5g') sprintf('\t\tmaxError: \t\t') num2str(testing.optimal.trainSet.maxError,'%10.5g')]);
+    mssg([sprintf('OPTIMAL\t\t| maxRelativeError: \t') num2str(testing.optimal.testSet.maxRelativeError,'%10.5g') sprintf('\t\tmaxRelativeError: \t') num2str(testing.optimal.trainSet.maxRelativeError,'%10.5g')]);
+    mssg([sprintf('\t\t| err < 0.05:\t\t') num2str(testing.optimal.testSet.acc5percent*100,'%4.2f') '%%' sprintf('\t\terr < 0.05:\t\t') num2str(testing.optimal.trainSet.acc5percent*100,'%4.2f') '%%']);
+    mssg([sprintf('\t\t| err < 0.1:\t\t') num2str(testing.optimal.testSet.acc10percent*100,'%4.2f') '%%' sprintf('\t\terr < 0.1:\t\t') num2str(testing.optimal.trainSet.acc10percent*100,'%4.2f') '%%']);
+    mssg(sprintf('\t\t|'));
+    mssg([sprintf('\t\t| Error: \t\t') num2str(testing.current.testSet.error,'%10.5g') sprintf('\t\tError: \t\t\t') num2str(testing.current.trainSet.error,'%10.5g')]);
+    mssg([sprintf('\t\t| maxError: \t\t') num2str(testing.current.testSet.maxError,'%10.5g') sprintf('\t\tmaxError: \t\t') num2str(testing.current.trainSet.maxError,'%10.5g')]);
+    mssg([sprintf('CURRENT\t\t| maxRelativeError: \t') num2str(testing.current.testSet.maxRelativeError,'%10.5g') sprintf('\t\tmaxRelativeError: \t') num2str(testing.current.trainSet.maxRelativeError,'%10.5g')]);
+    mssg([sprintf('\t\t| err < 0.05:\t\t') num2str(testing.current.testSet.acc5percent*100,'%4.2f') '%%' sprintf('\t\terr < 0.05:\t\t') num2str(testing.current.trainSet.acc5percent*100,'%4.2f') '%%']);
+    mssg([sprintf('\t\t| err < 0.1:\t\t') num2str(testing.current.testSet.acc10percent*100,'%4.2f') '%%' sprintf('\t\terr < 0.1:\t\t') num2str(testing.current.trainSet.acc10percent*100,'%4.2f') '%%']);
+    mssg(sprintf('--------------------------------------------------------------------------------------'));
 end

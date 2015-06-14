@@ -37,13 +37,13 @@ else
         end
     end
 
-    %message(sprintf('\n\t\t\tTESTSET\t\t\t\t\t\tTRAINSET'));
-    message(['                 |' header]);
-    message(['-----------------|' line]);
-    message(['OPTIMAL ACCURACY |' accuracies.optimal ]);
-    message(['OPTIMAL ERROR    |' errors.optimal     ]);
-    message( '                 |' );
-    message(['CURRENT ACCURACY |' accuracies.current ]);
-    message(['CURRENT ERROR    |' errors.current     ]);
-    message(['-----------------|' line]);
+    %mssg(sprintf('\n\t\t\tTESTSET\t\t\t\t\t\tTRAINSET'));
+    mssg(['                 |' header]);
+    mssg(['-----------------|' line]);
+    mssg(['OPTIMAL ACCURACY |' accuracies.optimal ]);
+    mssg(['OPTIMAL ERROR    |' errors.optimal     ]);
+    mssg( '                 |' );
+    mssg(['CURRENT ACCURACY |' accuracies.current ]);
+    mssg(['CURRENT ERROR    |' errors.current     ]);
+    mssg(['-----------------|' line]);
 end

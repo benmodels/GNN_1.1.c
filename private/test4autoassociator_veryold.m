@@ -204,19 +204,19 @@ if VisualMode == 1
     end
     
 else
-    message(sprintf('\n\t\t\tTESTSET\t\t\t\t\t\tTRAINSET'));
-    message(sprintf('-----------------------------------------------------------------------------------------------'));
-    message([sprintf('\t\t| Accuracy: \t\t') num2str(testing.optimal.testSet.accuracy*100,'%4.2f') '%%' sprintf('\t\t\tAccuracy: \t\t') num2str(testing.optimal.trainSet.accuracy*100,'%4.2f') '%%']);
+    mssg(sprintf('\n\t\t\tTESTSET\t\t\t\t\t\tTRAINSET'));
+    mssg(sprintf('-----------------------------------------------------------------------------------------------'));
+    mssg([sprintf('\t\t| Accuracy: \t\t') num2str(testing.optimal.testSet.accuracy*100,'%4.2f') '%%' sprintf('\t\t\tAccuracy: \t\t') num2str(testing.optimal.trainSet.accuracy*100,'%4.2f') '%%']);
     if isfield(dataSet.config,'graphDim')&&dataSet.trainSet.graphNum > 1
-        message([sprintf('\t\t| Accuracy on graphs: \t') num2str(testing.optimal.testSet.accuracyOnGraphs*100,'%4.2f') '%%' sprintf('\t\t\tAccuracy on graphs: \t') num2str(testing.optimal.trainSet.accuracyOnGraphs*100,'%4.2f') '%%']);
+        mssg([sprintf('\t\t| Accuracy on graphs: \t') num2str(testing.optimal.testSet.accuracyOnGraphs*100,'%4.2f') '%%' sprintf('\t\t\tAccuracy on graphs: \t') num2str(testing.optimal.trainSet.accuracyOnGraphs*100,'%4.2f') '%%']);
     end
-    message(['OPTIMAL' sprintf('\t\t| Error: \t\t') num2str(testing.optimal.testSet.error,'%10.5g') sprintf('\t\t\tError: \t\t\t') num2str(testing.optimal.trainSet.error,'%10.5g')]);
-    message(sprintf('\t\t|'));
-    message(sprintf('\t\t|'));
-    message([sprintf('\t\t| Accuracy: \t\t') num2str(testing.current.testSet.accuracy*100,'%4.2f') '%%' sprintf('\t\t\tAccuracy: \t\t') num2str(testing.current.trainSet.accuracy*100,'%4.2f') '%%']);
+    mssg(['OPTIMAL' sprintf('\t\t| Error: \t\t') num2str(testing.optimal.testSet.error,'%10.5g') sprintf('\t\t\tError: \t\t\t') num2str(testing.optimal.trainSet.error,'%10.5g')]);
+    mssg(sprintf('\t\t|'));
+    mssg(sprintf('\t\t|'));
+    mssg([sprintf('\t\t| Accuracy: \t\t') num2str(testing.current.testSet.accuracy*100,'%4.2f') '%%' sprintf('\t\t\tAccuracy: \t\t') num2str(testing.current.trainSet.accuracy*100,'%4.2f') '%%']);
     if isfield(dataSet.config,'graphDim')&&dataSet.trainSet.graphNum > 1
-       message([sprintf('\t\t| Accuracy on graphs: \t') num2str(testing.current.testSet.accuracyOnGraphs*100,'%4.2f') '%%' sprintf('\t\t\tAccuracy on graphs: \t') num2str(testing.current.trainSet.accuracyOnGraphs*100,'%4.2f') '%%']);
+       mssg([sprintf('\t\t| Accuracy on graphs: \t') num2str(testing.current.testSet.accuracyOnGraphs*100,'%4.2f') '%%' sprintf('\t\t\tAccuracy on graphs: \t') num2str(testing.current.trainSet.accuracyOnGraphs*100,'%4.2f') '%%']);
     end
-    message(['CURRENT' sprintf('\t\t| Error: \t\t') num2str(testing.current.testSet.error,'%10.5g') sprintf('\t\t\tError: \t\t\t') num2str(testing.current.trainSet.error,'%10.5g')]);
-    message(sprintf('-----------------------------------------------------------------------------------------------'));
+    mssg(['CURRENT' sprintf('\t\t| Error: \t\t') num2str(testing.current.testSet.error,'%10.5g') sprintf('\t\t\tError: \t\t\t') num2str(testing.current.trainSet.error,'%10.5g')]);
+    mssg(sprintf('-----------------------------------------------------------------------------------------------'));
 end

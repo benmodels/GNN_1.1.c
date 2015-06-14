@@ -216,7 +216,7 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
         else
             validation_str='current';
             marker='';
-            message(['step: ' num2str(learning.current.nSteps) sprintf('\ttraining error: ') num2str(learning.current.trainError)])
+            mssg(['step: ' num2str(learning.current.nSteps) sprintf('\ttraining error: ') num2str(learning.current.trainError)])
             if (learning.current.validationError == learning.current.bestErrorOnValidation)
                 if dynamicSystem.config.useAutoSave
                     autoSave;
@@ -227,25 +227,25 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
             
             if dynamicSystem.config.useValidationMistakenPatterns
                 if dynamicSystem.config.useBalancedDataset
-                    message([sprintf('\t\t\t') validation_str ' validation error: ' num2str(learning.current.validationError) ' (' num2str(learning.current.validationMistakenPatterns) ' errors [balanced])' marker]);
+                    mssg([sprintf('\t\t\t') validation_str ' validation error: ' num2str(learning.current.validationError) ' (' num2str(learning.current.validationMistakenPatterns) ' errors [balanced])' marker]);
                 else
-                    message([sprintf('\t\t\t') validation_str ' validation error: ' num2str(learning.current.validationError) ' (' num2str(learning.current.validationMistakenPatterns) ' errors)' marker]);
+                    mssg([sprintf('\t\t\t') validation_str ' validation error: ' num2str(learning.current.validationError) ' (' num2str(learning.current.validationMistakenPatterns) ' errors)' marker]);
                 end
             else
-                message([sprintf('\t\t\t') validation_str ' validation error: ' num2str(learning.current.validationError) marker]);
+                mssg([sprintf('\t\t\t') validation_str ' validation error: ' num2str(learning.current.validationError) marker]);
             end
 
             if (dynamicSystem.config.useJacobianControl) && (~isempty(overIndexes))
-                message([sprintf('\t\t\t') 'Max jacobian: ' num2str(full(learning.current.maxJac))]);
+                mssg([sprintf('\t\t\t') 'Max jacobian: ' num2str(full(learning.current.maxJac))]);
             end
         end
     else    % if useValidation=0 optimalParameters are currentParameters
         if mod(learning.current.nSteps, learning.config.stepsForValidation)==0
-            message(['step: ' num2str(learning.current.nSteps) sprintf('\ttraining error: ') num2str(learning.current.trainError)])
+            mssg(['step: ' num2str(learning.current.nSteps) sprintf('\ttraining error: ') num2str(learning.current.trainError)])
             learning.current.optimalParameters=dynamicSystem.parameters;
             learning.current.optimalStep=learning.current.nSteps;
             if (dynamicSystem.config.useJacobianControl) && (~isempty(overIndexes))
-                message([sprintf('\t\t\t') 'Max jacobian: ' num2str(full(learning.current.maxJac))]);
+                mssg([sprintf('\t\t\t') 'Max jacobian: ' num2str(full(learning.current.maxJac))]);
             end
             if dynamicSystem.config.useAutoSave
                 autoSave;
