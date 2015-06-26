@@ -6,7 +6,8 @@ global dynamicSystem comparisonNet
 gradient.weights2=delta*netState.hiddens';
 
 gradient.bias2=sum(delta,2);
-dnet1=(net.weights2'*delta) .* (1-netState.hiddens.*netState.hiddens);
+dyh_dzh = (1-netState.hiddens.*netState.hiddens);
+dnet1=(net.weights2'*delta) .* dyh_dzh;
 
 if dynamicSystem.config.useSaturationControl
     absval=abs(netState.hiddens)-dynamicSystem.config.saturationThreshold;

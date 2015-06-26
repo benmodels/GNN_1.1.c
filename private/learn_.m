@@ -73,16 +73,19 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
     [dynamicSystem.state,learning.current.forwardState,learning.current.forwardIt]=feval(dynamicSystem.config.forwardFunction,...
         learning.config.maxForwardSteps,dynamicSystem.state,'trainSet',0);
 
+    % -- Data Logging --
     if dynamicSystem.config.saveIterationHistory
         learning.history.forwardItHistory(learning.current.nSteps)=uint8(learning.current.forwardIt);
     end
     if dynamicSystem.config.saveStateHistory
         learning.history.stateHistory(:,learning.current.nSteps)=single(dynamicSystem.state(:));
     end
+    % ------------------
 
     % Computes the error
     [learning.current.trainError,learning.current.outState]=feval(dynamicSystem.config.computeErrorFunction,'trainSet',[],0);
     
+    % -- Data Logging --
     if dynamicSystem.config.saveErrorHistory
         learning.history.trainErrorHistory(learning.current.nSteps)=single(learning.current.trainError);
     end
@@ -90,7 +93,8 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
         learning.current.stabilityCoefficient=sum(sum(abs(learning.history.oldX-dynamicSystem.state)))/sum(sum(abs(learning.history.oldX)));
         learning.history.stabilityCoefficientHistory(learning.current.nSteps)=single(learning.current.stabilityCoefficient);
     end
-
+    % ------------------
+    
     % Saturation is measured
     if dynamicSystem.config.saveSaturationHistory
         if dynamicSystem.config.outNet.nLayers == 2
@@ -113,22 +117,29 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
     learning.history.oldX=dynamicSystem.state;
     learning.history.oldP=dynamicSystem.parameters;
 
-    % Computing the gradient
+    %% Computing the gradient
     [learning.current.outGradient,deltaX]=feval(dynamicSystem.config.computeDeltaErrorFunction,[]);
     [learning.current.forwardGradient,aa,learning.current.backwardIt]=feval(dynamicSystem.config.backwardFunction,deltaX,[],[]);
+    
+    % -- Data Logging --
     if dynamicSystem.config.saveIterationHistory
         learning.history.backwardItHistory(learning.current.nSteps)=uint8(learning.current.backwardIt);
     end
-
-    % computing Jacobian of transition function and eventually adapting the gradient
+    % ------------------
+    
+    %% computing Jacobian of transition function and eventually adapting the gradient
     if dynamicSystem.config.useJacobianControl,
       %  [learning.current.jacobian,learning.current.jacobianErrors]=feval(dynamicSystem.config.forwardJacobianFunction,'trainSet',[]);
         learning.current.maxJac=max(learning.current.jacobianErrors);
         learning.current.maxJacComplete=max(sum(abs(learning.current.jacobian)));
+        
+        % -- Data Logging --
         if dynamicSystem.config.saveJacobianHistory
             learning.history.jacobianHistory(learning.current.nSteps)=single(full(learning.current.maxJac));
             learning.history.jacobianHistoryComplete(learning.current.nSteps)=single(full(learning.current.maxJacComplete));
         end
+        % ------------------
+        
         overIndexes=find(learning.current.jacobianErrors);
         if (~isempty(overIndexes))
             learning.current.jacobianGradient=feval(dynamicSystem.config.backwardJacobianFunction,'trainSet',learning.current.jacobian,learning.current.jacobianErrors,[]);
@@ -140,7 +151,7 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
         end
     end
 
-    
+    global gain;
     % Every learning.config.stepsForValidation, we evaluate the error on validation set.
     if dynamicSystem.config.useValidation && mod(learning.current.nSteps, learning.config.stepsForValidation)==0
         learning.current.validationState=feval(dynamicSystem.config.forwardFunction,learning.config.maxStepsForValidation,learning.current.validationState,...
@@ -253,7 +264,7 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
         end
     end
 
-    %% Updating weights.
+    %% Updating outNet weights.
     for it1=fieldnames(learning.current.outGradient)'
         for it2=fieldnames(learning.current.outGradient.(char(it1)))'
             old4new=learning.current.outGradient.(char(it1)).(char(it2)) .* learning.current.rProp.oldGradient.(char(it1)).(char(it2));
@@ -279,8 +290,13 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
             learning.current.rProp.oldGradient.(char(it1)).(char(it2))=...
                 (old4new>=0) .* learning.current.outGradient.(char(it1)).(char(it2))...
                 +(old4new<0) .* zeros(size(learning.current.outGradient.(char(it1)).(char(it2))));
+
+%             dynamicSystem.parameters.(char(it1)).(char(it2))=learning.history.oldP.(char(it1)).(char(it2)) ...
+%                 - gain * learning.current.outGradient.(char(it1)).(char(it2));
+       
         end
     end
+    %% Updating transitionNet weights.
     for it1=fieldnames(learning.current.forwardGradient)'
         for it2=fieldnames(learning.current.forwardGradient.(char(it1)))'
             old4new=learning.current.forwardGradient.(char(it1)).(char(it2)) .* ...
@@ -298,7 +314,8 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
                 +(old4new<0) .* learning.current.rProp.deltaW.(char(it1)).(char(it2)) ...
                 +(old4new==0) .* (-sign(learning.current.forwardGradient.(char(it1)).(char(it2))) .* ...
                 learning.current.rProp.delta.(char(it1)).(char(it2)));
-
+            
+            % Update parameters
             dynamicSystem.parameters.(char(it1)).(char(it2))=learning.history.oldP.(char(it1)).(char(it2)) ...
                 +(old4new>0) .* learning.current.rProp.deltaW.(char(it1)).(char(it2)) ...
                 -(old4new<0) .* learning.current.rProp.deltaW.(char(it1)).(char(it2)) ...
@@ -317,6 +334,7 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
                 +(old4new<0) .* zeros(size(learning.current.forwardGradient.(char(it1)).(char(it2))));
         end
     end
+    
     learning.current.nSteps=learning.current.nSteps+1;
 end
 

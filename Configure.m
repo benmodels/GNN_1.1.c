@@ -96,6 +96,7 @@ addpath(genpath(pwd));
                 section = 'g';
             else
                 err(numline,'No section appers to be open');
+                section = 'u';
             end
             line = strtok(line, delimiter);
             k = strfind(line,'=');
@@ -235,7 +236,8 @@ addpath(genpath(pwd));
     
     dynamicSystem.config.configured=1;
     
-%    catch
+ catch msgs
+     rethrow(msgs);
 %      err(0,['Ooops. There was an error! Configuration was not completed.']);
 %      cleanup
 %      clear global dynamicSystem learning model model_name learn learn_name general general_name
@@ -322,7 +324,8 @@ try
             err(num,[a ' section already closed']);return;
         end
     end
-catch
+catch errmsg
+    rethrow(errmsg);    
     return;
 end
 
@@ -771,7 +774,8 @@ try
                 err(n,['Unknown parameter <' name '> in General Parameters section']);
         end
     end
-catch
+catch errmsg
+    rethrow(errmsg);
     return;
 end
 
