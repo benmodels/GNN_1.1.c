@@ -1,13 +1,13 @@
 %function [f,netState]=forwardOneLayerLinearOutNet(x,net)
-function netState=forwardOneLayerLinearOutNet(x,net,optimalParam)
+function netState=forwardOneLayerLinearOutNet(x,net,optimalParam,n)
 
 global dynamicSystem learning
 
 sx=size(x,2);
 if ~optimalParam
-    netState.outs=dynamicSystem.parameters.(net).weights1*x+repmat(dynamicSystem.parameters.(net).bias1, [1 sx]);
+    netState.outs=dynamicSystem.parameters.(net)(n).weights1*x+repmat(dynamicSystem.parameters.(net)(n).bias1, [1 sx]);
 else
-    netState.outs=learning.current.optimalParameters.(net).weights1*x+repmat(learning.current.optimalParameters.(net).bias1, [1 sx]);
+    netState.outs=learning.current.optimalParameters.(net)(n).weights1*x+repmat(learning.current.optimalParameters.(net)(n).bias1, [1 sx]);
 end
 
 %%%%%%% optimization: %%%%%%%%%%

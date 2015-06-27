@@ -6,7 +6,7 @@ function neuralModelInitialize
 % of the system and the trainset parameters: do not manually edit
 global dynamicSystem dataSet
 
-dynamicSystem.config.outNet.nInputs=dynamicSystem.config.nStates+dataSet.config.nodeLabelsDim;
+dynamicSystem.config.outNet.nInputs=dynamicSystem.config.nStates+dynamicSystem.config.nStates+dataSet.config.nodeLabelsDim;
 dynamicSystem.config.outNet.nOuts=dynamicSystem.config.nOuts;
 [dynamicSystem.parameters.outNet,dynamicSystem.config.outNet]=initializeNet(dynamicSystem.config.outNet);
 
@@ -16,7 +16,8 @@ else
     dynamicSystem.config.transitionNet.nInputs=2*dataSet.config.nodeLabelsDim+dynamicSystem.config.nStates;
 end
 dynamicSystem.config.transitionNet.nOuts=dynamicSystem.config.nStates;
-[dynamicSystem.parameters.transitionNet,dynamicSystem.config.transitionNet]=initializeNet(dynamicSystem.config.transitionNet);
+[dynamicSystem.parameters.transitionNet(1),dynamicSystem.config.transitionNet]=initializeNet(dynamicSystem.config.transitionNet);
+[dynamicSystem.parameters.transitionNet(2),dynamicSystem.config.transitionNet]=initializeNet(dynamicSystem.config.transitionNet);
 
 %COMPUTING USEFUL DATA
 % E=speye(dynamicSystem.config.nStates); % da riusare tutte le volte che serve

@@ -1,10 +1,10 @@
-function [e,outState]=neuralModelComputeError(dataset,x,optimalParam)
+function [e,outState]=mseComputeError(dataset,x,optimalParam)
 
 global dataSet dynamicSystem learning
 
 %% x will be empty except when called to test the results
 if isempty(x) && strcmp(dataset,'trainSet')
-    in=[dynamicSystem.state;dataSet.trainSet.nodeLabels];
+    in=[dynamicSystem.state{1};dynamicSystem.state{2};dataSet.trainSet.nodeLabels];
 elseif isempty(x) && strcmp(dataset,'validationSet')
     in=[learning.current.validationState;dataSet.validationSet.nodeLabels];
 else

@@ -1,5 +1,5 @@
 %function [x,state,i]=neuralModelRunForward(maxIt,x,dataset,p,sys,stopCoef)
-function [x,state,i]=neuralModelRunForward(maxSteps,x,dataset,optimalParam)
+function [x,state,i]=neuralModelRunForward(maxSteps,x,dataset,optimalParam,n)
 %% This function just call forward a number "n" of times and compute the new state.
 
 global dataSet dynamicSystem learning
@@ -22,7 +22,7 @@ for i=1:maxSteps
     %[y,state.transitionNet]=feval(sys.transitionNet.forwardFunction,in,p.transitionNet);
     %s=dataset.neuralModel.childToArcMatrix' *y(:);
     %state.transitionNet=feval(sys.transitionNet.forwardFunction,in,'transitionNet');
-    state.transitionNetState=feval(dynamicSystem.config.transitionNet.forwardFunction,in,'transitionNet',optimalParam);
+    state.transitionNetState=feval(dynamicSystem.config.transitionNet.forwardFunction,in,'transitionNet',optimalParam,n);
 
     %s=dataset.neuralModel.childToArcMatrix' *state.transitionNet.outs(:);
     % state.transitionNetState correspond to the state values for each

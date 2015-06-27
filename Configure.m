@@ -166,7 +166,9 @@ addpath(genpath(pwd));
     else
         dynamicSystem.config.nOuts=size(dataSet.trainSet.targets,1);
     end
-    dynamicSystem.state=zeros(dynamicSystem.config.nStates,dataSet.trainSet.nNodes);
+    % TODO: isn't it better to initialize with random values?
+    dynamicSystem.state{1}=zeros(dynamicSystem.config.nStates,dataSet.trainSet.nNodes);
+    dynamicSystem.state{2}=zeros(dynamicSystem.config.nStates,dataSet.trainSet.nNodes);
     learning.current.bestErrorOnValidation=realmax;
     learning.current.nSteps=1;
     if dynamicSystem.config.useValidation
@@ -184,9 +186,11 @@ addpath(genpath(pwd));
     
     for it1=fieldnames(dynamicSystem.parameters)'
         for it2=fieldnames(dynamicSystem.parameters.(char(it1)))'
-            learning.current.rProp.delta.(char(it1)).(char(it2)) =0.001*ones(size(dynamicSystem.parameters.(char(it1)).(char(it2))));
-            learning.current.rProp.deltaW.(char(it1)).(char(it2)) =zeros(size(dynamicSystem.parameters.(char(it1)).(char(it2))));
-            learning.current.rProp.oldGradient.(char(it1)).(char(it2))=zeros(size(dynamicSystem.parameters.(char(it1)).(char(it2))));
+            for it3 = 1:numel(dynamicSystem.parameters.(char(it1)))
+                learning.current.rProp.delta.(char(it1))(it3).(char(it2)) =0.001*ones(size(dynamicSystem.parameters.(char(it1))(it3).(char(it2))));
+                learning.current.rProp.deltaW.(char(it1))(it3).(char(it2)) =zeros(size(dynamicSystem.parameters.(char(it1))(it3).(char(it2))));
+                learning.current.rProp.oldGradient.(char(it1))(it3).(char(it2))=zeros(size(dynamicSystem.parameters.(char(it1))(it3).(char(it2))));
+            end
         end
     end
     learning.history.oldP=dynamicSystem.parameters;

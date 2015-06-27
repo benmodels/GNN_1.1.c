@@ -1,5 +1,5 @@
 %function [jacobian,jacobianError]=neuralModelGetJacobian(dataset,p,forwardState,sys)
-function [jacobian,jacobianError]=neuralModelGetJacobian(dataset,forwardState)
+function [jacobian,jacobianError]=neuralModelGetJacobian(dataset,forwardState,n)
 global dataSet dynamicSystem learning
 
 %xdim=dynamicSystem.config.nStates;
@@ -12,8 +12,8 @@ for i=1:dynamicSystem.config.nStates
     eDelta(i,:)=1;
     
     if isempty(forwardState)
-        [g,dj]= feval(dynamicSystem.config.transitionNet.backwardFunction,dynamicSystem.parameters.transitionNet,...
-            learning.current.forwardState.transitionNetState,eDelta);
+        [g,dj]= feval(dynamicSystem.config.transitionNet.backwardFunction,dynamicSystem.parameters.transitionNet(n),...
+            learning.current.forwardState(n).transitionNetState,eDelta);
     else
         [g,dj]= feval(dynamicSystem.config.transitionNet.backwardFunction,dynamicSystem.parameters.transitionNet,...
             forwardState.transitionNetState,eDelta);

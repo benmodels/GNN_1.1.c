@@ -70,9 +70,13 @@ end
 while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(stopLearn)
 
     % COMPUTING THE NEW STABLE STATE x=dynamicSystem.state;
-    [dynamicSystem.state,learning.current.forwardState,learning.current.forwardIt]=feval(dynamicSystem.config.forwardFunction,...
-        learning.config.maxForwardSteps,dynamicSystem.state,'trainSet',0);
-
+    ntrans = 2;
+    for i = 1:ntrans
+        [dynamicSystem.state{i},learning.current.forwardState(i),learning.current.forwardIt]=feval(dynamicSystem.config.forwardFunction,...
+            learning.config.maxForwardSteps,dynamicSystem.state{i},'trainSet',0,i);
+    end
+    
+    
     % -- Data Logging --
     if dynamicSystem.config.saveIterationHistory
         learning.history.forwardItHistory(learning.current.nSteps)=uint8(learning.current.forwardIt);
@@ -90,7 +94,7 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
         learning.history.trainErrorHistory(learning.current.nSteps)=single(learning.current.trainError);
     end
     if dynamicSystem.config.saveStabilityCoefficientHistory
-        learning.current.stabilityCoefficient=sum(sum(abs(learning.history.oldX-dynamicSystem.state)))/sum(sum(abs(learning.history.oldX)));
+        learning.current.stabilityCoefficient=sum(sum(abs(learning.history.oldX{1}-dynamicSystem.state{1})))/sum(sum(abs(learning.history.oldX{1})));
         learning.history.stabilityCoefficientHistory(learning.current.nSteps)=single(learning.current.stabilityCoefficient);
     end
     % ------------------
@@ -119,7 +123,7 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
 
     %% Computing the gradient
     [learning.current.outGradient,deltaX]=feval(dynamicSystem.config.computeDeltaErrorFunction,[]);
-    [learning.current.forwardGradient,aa,learning.current.backwardIt]=feval(dynamicSystem.config.backwardFunction,deltaX,[],[]);
+    [learning.current.forwardGradient,~,learning.current.backwardIt]=feval(dynamicSystem.config.backwardFunction,deltaX,[],[]);
     
     % -- Data Logging --
     if dynamicSystem.config.saveIterationHistory
