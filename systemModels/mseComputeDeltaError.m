@@ -4,7 +4,7 @@ function [gradient,dInputs]=mseComputeDeltaError(outState)
 global dynamicSystem learning
 
 %sx=size(x);
-sx=size(dynamicSystem.state,1);
+sx=size(dynamicSystem.state{1},1)*dynamicSystem.ntrans;
 
 
 if isempty(outState)

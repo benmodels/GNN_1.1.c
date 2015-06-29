@@ -66,20 +66,23 @@ if dynamicSystem.config.useValidation
     validationIndex=find(diag(dataSet.validationSet.maskMatrix));
 end
 
+terminateOnValidation = dynamicSystem.config.terminateOnValidation;
+max_fail = dynamicSystem.config.max_fail;
+% learning.current.validationFail = 0;
 % MAIN LEARNING CYCLE
-while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(stopLearn)
+while ( (learning.current.nSteps<iStart+learning.config.learningSteps && isempty(stopLearn)) &&...
+        ( ( terminateOnValidation == 1) && (learning.current.validationFail < max_fail)))
 
     % COMPUTING THE NEW STABLE STATE x=dynamicSystem.state;
-    ntrans = 2;
-    for i = 1:ntrans
-        [dynamicSystem.state{i},learning.current.forwardState(i),learning.current.forwardIt]=feval(dynamicSystem.config.forwardFunction,...
+    for i = 1:dynamicSystem.ntrans
+        [dynamicSystem.state{i},learning.current.forwardState(i),learning.current.forwardIt(1,i)]=feval(dynamicSystem.config.forwardFunction,...
             learning.config.maxForwardSteps,dynamicSystem.state{i},'trainSet',0,i);
     end
     
     
     % -- Data Logging --
     if dynamicSystem.config.saveIterationHistory
-        learning.history.forwardItHistory(learning.current.nSteps)=uint8(learning.current.forwardIt);
+        learning.history.forwardItHistory(learning.current.nSteps,:)=uint8(learning.current.forwardIt);
     end
     if dynamicSystem.config.saveStateHistory
         learning.history.stateHistory(:,learning.current.nSteps)=single(dynamicSystem.state(:));
@@ -90,12 +93,14 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
     [learning.current.trainError,learning.current.outState]=feval(dynamicSystem.config.computeErrorFunction,'trainSet',[],0);
     
     % -- Data Logging --
-    if dynamicSystem.config.saveErrorHistory
-        learning.history.trainErrorHistory(learning.current.nSteps)=single(learning.current.trainError);
-    end
-    if dynamicSystem.config.saveStabilityCoefficientHistory
-        learning.current.stabilityCoefficient=sum(sum(abs(learning.history.oldX{1}-dynamicSystem.state{1})))/sum(sum(abs(learning.history.oldX{1})));
-        learning.history.stabilityCoefficientHistory(learning.current.nSteps)=single(learning.current.stabilityCoefficient);
+    for nt = 1:dynamicSystem.ntrans
+        if dynamicSystem.config.saveErrorHistory
+            learning.history.trainErrorHistory(learning.current.nSteps)=single(learning.current.trainError);
+        end
+        if dynamicSystem.config.saveStabilityCoefficientHistory
+            learning.current.stabilityCoefficient{nt}=sum(sum(abs(learning.history.oldX{nt}-dynamicSystem.state{nt})))/sum(sum(abs(learning.history.oldX{nt})));
+            learning.history.stabilityCoefficientHistory{nt}(learning.current.nSteps)=single(learning.current.stabilityCoefficient{nt});
+        end
     end
     % ------------------
     
@@ -107,9 +112,11 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
             learning.history.saturationCoefficient.outNet(learning.current.nSteps)=single(learning.current.saturationCoefficient.outNet);
         end
         if dynamicSystem.config.transitionNet.nLayers == 2
-            learning.current.saturationCoefficient.transitionNet=norm(learning.current.forwardState.transitionNetState.hiddens)^2/...
-                size(learning.current.forwardState.transitionNetState.hiddens,1)/size(learning.current.forwardState.transitionNetState.hiddens,2);
-            learning.history.saturationCoefficient.transitionNet(learning.current.nSteps)=single(learning.current.saturationCoefficient.transitionNet);
+            for nt = 1:dynamicSystem.ntrans
+                learning.current.saturationCoefficient.transitionNet{nt}=norm(learning.current.forwardState(nt).transitionNetState.hiddens)^2/...
+                    size(learning.current.forwardState(nt).transitionNetState.hiddens,1)/size(learning.current.forwardState(nt).transitionNetState.hiddens,2);
+                learning.history.saturationCoefficient.transitionNet{nt}(learning.current.nSteps)=single(learning.current.saturationCoefficient.transitionNet{nt});
+            end
         end
         if strcmp(dynamicSystem.config.type,'linear') && (dynamicSystem.config.forcingNet.nLayers == 2)
             learning.current.saturationCoefficient.forcingNet=norm(learning.current.forwardState.forcingNet.hiddens)^2/...
@@ -127,30 +134,31 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
     
     % -- Data Logging --
     if dynamicSystem.config.saveIterationHistory
-        learning.history.backwardItHistory(learning.current.nSteps)=uint8(learning.current.backwardIt);
+        learning.history.backwardItHistory(learning.current.nSteps,:)=uint8(learning.current.backwardIt);
     end
     % ------------------
     
     %% computing Jacobian of transition function and eventually adapting the gradient
-    if dynamicSystem.config.useJacobianControl,
-      %  [learning.current.jacobian,learning.current.jacobianErrors]=feval(dynamicSystem.config.forwardJacobianFunction,'trainSet',[]);
-        learning.current.maxJac=max(learning.current.jacobianErrors);
-        learning.current.maxJacComplete=max(sum(abs(learning.current.jacobian)));
-        
-        % -- Data Logging --
-        if dynamicSystem.config.saveJacobianHistory
-            learning.history.jacobianHistory(learning.current.nSteps)=single(full(learning.current.maxJac));
-            learning.history.jacobianHistoryComplete(learning.current.nSteps)=single(full(learning.current.maxJacComplete));
-        end
-        % ------------------
-        
-        overIndexes=find(learning.current.jacobianErrors);
-        if (~isempty(overIndexes))
-            learning.current.jacobianGradient=feval(dynamicSystem.config.backwardJacobianFunction,'trainSet',learning.current.jacobian,learning.current.jacobianErrors,[]);
-            for it=fieldnames(learning.current.jacobianGradient)'
-                learning.current.forwardGradient.transitionNet.(char(it))=...
-                    learning.current.forwardGradient.transitionNet.(char(it))+...
-                    dynamicSystem.config.jacobianFactorCoeff*learning.current.jacobianGradient.(char(it));
+    for nt = 1:dynamicSystem.ntrans
+        if dynamicSystem.config.useJacobianControl,
+          %  [learning.current.jacobian,learning.current.jacobianErrors]=feval(dynamicSystem.config.forwardJacobianFunction,'trainSet',[]);
+            learning.current.maxJac{nt}=max(learning.current.jacobianErrors{nt});
+            learning.current.maxJacComplete{nt}=max(sum(abs(learning.current.jacobian{nt})));
+
+            % -- Data Logging --
+            if dynamicSystem.config.saveJacobianHistory
+                learning.history.jacobianHistory{nt}(learning.current.nSteps)=single(full(learning.current.maxJac{nt}));
+                learning.history.jacobianHistoryComplete{nt}(learning.current.nSteps)=single(full(learning.current.maxJacComplete{nt}));
+            end
+            % ------------------
+            overIndexes=find(learning.current.jacobianErrors{nt});
+            if (~isempty(overIndexes))
+                learning.current.jacobianGradient{nt}=feval(dynamicSystem.config.backwardJacobianFunction,'trainSet',learning.current.jacobian{nt},learning.current.jacobianErrors{nt},[],nt);
+                for it=fieldnames(learning.current.jacobianGradient{nt})'
+                    learning.current.forwardGradient.transitionNet(nt).(char(it))=...
+                        learning.current.forwardGradient.transitionNet(nt).(char(it))+...
+                        dynamicSystem.config.jacobianFactorCoeff*learning.current.jacobianGradient{nt}.(char(it));
+                end
             end
         end
     end
@@ -158,8 +166,12 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
     global gain;
     % Every learning.config.stepsForValidation, we evaluate the error on validation set.
     if dynamicSystem.config.useValidation && mod(learning.current.nSteps, learning.config.stepsForValidation)==0
-        learning.current.validationState=feval(dynamicSystem.config.forwardFunction,learning.config.maxStepsForValidation,learning.current.validationState,...
-            'validationSet',0);
+        for i = 1:dynamicSystem.ntrans
+            learning.current.validationState{i}=feval(dynamicSystem.config.forwardFunction,learning.config.maxStepsForValidation,learning.current.validationState{i},...
+            'validationSet',0,i);
+        end
+
+        
         [learning.current.validationError learning.current.validationOut]=feval(dynamicSystem.config.computeErrorFunction,'validationSet',[],0);
         if dynamicSystem.config.saveErrorHistory
             learning.history.validationErrorHistory=[learning.history.validationErrorHistory,single(learning.current.validationError)];
@@ -215,7 +227,11 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
                 learning.current.optimalParameters=dynamicSystem.parameters;
                 learning.current.optimalStep=learning.current.nSteps;
                 learning.current.optimalValidationOut=learning.current.validationOut.outNetState.outs;
+                learning.current.validationFail = 0;
+            else
+                learning.current.validationFail = learning.current.validationFail + 1;
             end
+            
         end
 
         if VisualMode,
@@ -251,7 +267,7 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
             end
 
             if (dynamicSystem.config.useJacobianControl) && (~isempty(overIndexes))
-                mssg([sprintf('\t\t\t') 'Max jacobian: ' num2str(full(learning.current.maxJac))]);
+                mssg([sprintf('\t\t\t') 'Max jacobian: ' num2str(full(learning.current.maxJac{1}))]);%fixme
             end
         end
     else    % if useValidation=0 optimalParameters are currentParameters
@@ -260,7 +276,7 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
             learning.current.optimalParameters=dynamicSystem.parameters;
             learning.current.optimalStep=learning.current.nSteps;
             if (dynamicSystem.config.useJacobianControl) && (~isempty(overIndexes))
-                mssg([sprintf('\t\t\t') 'Max jacobian: ' num2str(full(learning.current.maxJac))]);
+                mssg([sprintf('\t\t\t') 'Max jacobian: ' num2str(full(learning.current.maxJac{1}))]);
             end
             if dynamicSystem.config.useAutoSave
                 autoSave;
@@ -301,41 +317,41 @@ while learning.current.nSteps<iStart+learning.config.learningSteps && isempty(st
         end
     end
     %% Updating transitionNet weights.
-    for it1=fieldnames(learning.current.forwardGradient)'
-        for it2=fieldnames(learning.current.forwardGradient.(char(it1)))'
-            old4new=learning.current.forwardGradient.(char(it1)).(char(it2)) .* ...
-                learning.current.rProp.oldGradient.(char(it1)).(char(it2));
-            learning.current.rProp.delta.(char(it1)).(char(it2)) =...
+    for it3 = 1:dynamicSystem.ntrans;
+        for it2=fieldnames(learning.current.forwardGradient.transitionNet(it3))'
+            old4new=learning.current.forwardGradient.transitionNet(it3).(char(it2)) .* ...
+                learning.current.rProp.oldGradient.transitionNet(it3).(char(it2));
+            learning.current.rProp.delta.transitionNet(it3).(char(it2)) =...
                 (old4new>0) .* min(learning.config.rProp.deltaMax,learning.config.rProp.etaP * ...
-                learning.current.rProp.delta.(char(it1)).(char(it2))) ...
+                learning.current.rProp.delta.transitionNet(it3).(char(it2))) ...
                 +(old4new<0) .* max(learning.config.rProp.deltaMin,learning.config.rProp.etaM * ...
-                learning.current.rProp.delta.(char(it1)).(char(it2))) ...
-                +(old4new==0) .* learning.current.rProp.delta.(char(it1)).(char(it2));
+                learning.current.rProp.delta.transitionNet(it3).(char(it2))) ...
+                +(old4new==0) .* learning.current.rProp.delta.transitionNet(it3).(char(it2));
 
-            learning.current.rProp.deltaW.(char(it1)).(char(it2)) =...
-                (old4new>0) .*(-sign(learning.current.forwardGradient.(char(it1)).(char(it2))) .* ...
-                learning.current.rProp.delta.(char(it1)).(char(it2)))...
-                +(old4new<0) .* learning.current.rProp.deltaW.(char(it1)).(char(it2)) ...
-                +(old4new==0) .* (-sign(learning.current.forwardGradient.(char(it1)).(char(it2))) .* ...
-                learning.current.rProp.delta.(char(it1)).(char(it2)));
-            
+            learning.current.rProp.deltaW.transitionNet(it3).(char(it2)) =...
+                (old4new>0) .*(-sign(learning.current.forwardGradient.transitionNet(it3).(char(it2))) .* ...
+                learning.current.rProp.delta.transitionNet(it3).(char(it2)))...
+                +(old4new<0) .* learning.current.rProp.deltaW.transitionNet(it3).(char(it2)) ...
+                +(old4new==0) .* (-sign(learning.current.forwardGradient.transitionNet(it3).(char(it2))) .* ...
+                learning.current.rProp.delta.transitionNet(it3).(char(it2)));
+
             % Update parameters
-            dynamicSystem.parameters.(char(it1)).(char(it2))=learning.history.oldP.(char(it1)).(char(it2)) ...
-                +(old4new>0) .* learning.current.rProp.deltaW.(char(it1)).(char(it2)) ...
-                -(old4new<0) .* learning.current.rProp.deltaW.(char(it1)).(char(it2)) ...
-                +(old4new==0) .* learning.current.rProp.deltaW.(char(it1)).(char(it2));
-            
-                        % make transition networks fixed for some epochs
-%                         if learning.current.nSteps<=200
-%                            dynamicSystem.parameters.transitionNet.(char(it2))=learning.history.oldP.transitionNet.(char(it2));
-%                         end
-%                         if learning.current.nSteps==200
-%                             learning.current.rProp.delta.(char(it1)).(char(it2)) = 0.001 * ones(size(learning.current.rProp.delta.(char(it1)).(char(it2))));
-%                         end
+            dynamicSystem.parameters.transitionNet(it3).(char(it2))=learning.history.oldP.transitionNet(it3).(char(it2)) ...
+                +(old4new>0) .* learning.current.rProp.deltaW.transitionNet(it3).(char(it2)) ...
+                -(old4new<0) .* learning.current.rProp.deltaW.transitionNet(it3).(char(it2)) ...
+                +(old4new==0) .* learning.current.rProp.deltaW.transitionNet(it3).(char(it2));
 
-            learning.current.rProp.oldGradient.(char(it1)).(char(it2))=...
-                (old4new>=0) .* learning.current.forwardGradient.(char(it1)).(char(it2))...
-                +(old4new<0) .* zeros(size(learning.current.forwardGradient.(char(it1)).(char(it2))));
+                        % make transition networks fixed for some epochs
+    %                         if learning.current.nSteps<=200
+    %                            dynamicSystem.parameters.transitionNet(it3).(char(it2))=learning.history.oldP.transitionNet(it3).(char(it2));
+    %                         end
+    %                         if learning.current.nSteps==200
+    %                             learning.current.rProp.delta.transitionNet(it3).(char(it2)) = 0.001 * ones(size(learning.current.rProp.delta.transitionNet(it3).(char(it2))));
+    %                         end
+
+            learning.current.rProp.oldGradient.transitionNet(it3).(char(it2))=...
+                (old4new>=0) .* learning.current.forwardGradient.transitionNet(it3).(char(it2))...
+                +(old4new<0) .* zeros(size(learning.current.forwardGradient.transitionNet(it3).(char(it2))));
         end
     end
     

@@ -1,15 +1,21 @@
 function plotTrainingResults
-global learning
+global learning dynamicSystem
 
 if isfield(learning.history, 'saturationCoefficient')
     figure('Name','Saturation Coefficients','NumberTitle','off');
     i=1;
     color=['b','r','k'];
     leg=cell(1,1);
-    hold on
-    for it = fieldnames(learning.history.saturationCoefficient)'
-        plot([1:size(learning.history.saturationCoefficient.(char(it)),2)],learning.history.saturationCoefficient.(char(it)),color(i));
-        leg{i} = char(it);
+    hold all
+    tmp = learning.history.saturationCoefficient.outNet;
+    plot([1:size(tmp,2)],tmp,color(i));
+    leg{i} = 'outNet';
+    i = i+1;
+    N = numel(learning.history.saturationCoefficient.transitionNet);
+    for nt = 1:N
+        tmp = learning.history.saturationCoefficient.transitionNet{nt};
+        plot([1:size(tmp,2)],tmp);
+        leg{i} = ['transitionNet-' num2str(nt)];
         i = i+1;
     end
     hold off;
@@ -29,19 +35,28 @@ end
 
 if isfield(learning.history, 'stabilityCoefficientHistory')
     figure('Name','Stability Coefficient History','NumberTitle','off');
-    plot([1:size(learning.history.stabilityCoefficientHistory,2)],learning.history.stabilityCoefficientHistory);
+    hold all
+    for nt = 1:dynamicSystem.ntrans
+        plot([1:size(learning.history.stabilityCoefficientHistory{nt},2)],learning.history.stabilityCoefficientHistory{nt});
+    end
     title('Stability Coefficient History');
 end
 
 if isfield(learning.history, 'jacobianHistory')
     figure('Name','Jacobian Error History','NumberTitle','off');
-    plot([1:size(learning.history.jacobianHistory,2)],learning.history.jacobianHistory);
+    hold all;
+    for nt = 1:dynamicSystem.ntrans
+        plot([1:size(learning.history.jacobianHistory{nt},2)],learning.history.jacobianHistory{nt});
+    end
     title('Jacobian Error History');
 end
 
 if isfield(learning.history, 'jacobianHistoryComplete')
     figure('Name','Jacobian History','NumberTitle','off');
-    plot([1:size(learning.history.jacobianHistoryComplete,2)],learning.history.jacobianHistoryComplete);
+    hold all;
+    for nt = 1:dynamicSystem.ntrans
+        plot([1:size(learning.history.jacobianHistoryComplete{nt},2)],learning.history.jacobianHistoryComplete{nt});
+    end
     title('Jacobian History');
 end
 

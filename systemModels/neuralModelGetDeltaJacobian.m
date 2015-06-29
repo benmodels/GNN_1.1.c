@@ -1,5 +1,5 @@
 %function grad=neuralModelGetDeltaJacobian(dataset,p,forwardState,jacobian,jacobianError,sys)
-function grad=neuralModelGetDeltaJacobian(dataset,jacobian,jacobianError,forwardState)
+function grad=neuralModelGetDeltaJacobian(dataset,jacobian,jacobianError,forwardState,nt)
 
 global dataSet dynamicSystem learning
 
@@ -10,7 +10,7 @@ pa=dataSet.(dataset).neuralModel.arcOfFatherMatrix * pe';
 [arc,j]=find(pa~=0);
 
 if isempty(forwardState)
-    base=learning.current.forwardState.transitionNetState.inputs(:,arc); %dataset.neuralModel.fatherOfArc(arc));
+    base=learning.current.forwardState(nt).transitionNetState.inputs(:,arc); %dataset.neuralModel.fatherOfArc(arc));
 else
     base=forwardState.transitionNetState.inputs(:,arc); %dataset.neuralModel.fatherOfArc(arc));
 end
@@ -22,6 +22,6 @@ for i=1:size(arc,1)
 end
 
 %[y,netState]=feval(sys.transitionNet.forwardFunction,base,p.transitionNet);
-netState=feval(dynamicSystem.config.transitionNet.forwardFunction,base,'transitionNet',0);
+netState=feval(dynamicSystem.config.transitionNet.forwardFunction,base,'transitionNet',0,nt);
 
-grad=feval(dynamicSystem.config.transitionNet.getDeltaJacobianFunction,dynamicSystem.parameters.transitionNet,netState,delta,j);
+grad=feval(dynamicSystem.config.transitionNet.getDeltaJacobianFunction,dynamicSystem.parameters.transitionNet(nt),netState,delta,j);

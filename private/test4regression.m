@@ -27,7 +27,10 @@ supervisedNodesNumberTest=size(supervisedNodesTest,1);
 %evaluating current parameters on trainset
 % [x,currentTrainForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state,dataSet.trainSet...
 %     ,dynamicSystem.parameters,dynamicSystem.config);
-[x,currentTrainForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state,'trainSet',0);
+for nt = 1:dynamicSystem.ntrans
+    [x{nt},currentTrainForwardState(nt)]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state{nt},'trainSet',0,nt);
+end
+% [x,currentTrainForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state,'trainSet',0);
 % [testing.current.trainSet.error,currentTrainOutState]=feval(dynamicSystem.config.computeErrorFunction,x,dataSet.trainSet,...
 %     dynamicSystem.parameters,dynamicSystem.config);
 [testing.current.trainSet.error,currentTrainOutState]=feval(dynamicSystem.config.computeErrorFunction,'trainSet',x,0);
@@ -44,7 +47,10 @@ testing.current.trainSet.forwardState=currentTrainForwardState;
 %evaluating optimal parameters on trainset
 % [x,trainForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state,dataSet.trainSet,...
 %     learning.current.optimalParameters,dynamicSystem.config);
-[x,trainForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state,'trainSet',1);
+for i = 1:dynamicSystem.ntrans
+    [x{i},trainForwardState(i)]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state{i},'trainSet',1,i);
+end
+% [x,trainForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state,'trainSet',1);
 % [testing.optimal.trainSet.error,trainOutState]=feval(dynamicSystem.config.computeErrorFunction,x,dataSet.trainSet,...
 %     learning.current.optimalParameters,dynamicSystem.config);
 [testing.optimal.trainSet.error,trainOutState]=feval(dynamicSystem.config.computeErrorFunction,'trainSet',x,1);
@@ -62,8 +68,10 @@ testing.optimal.trainSet.forwardState=trainForwardState;
 %     zeros(dynamicSystem.config.nStates,dataSet.testSet.nNodes),dataSet.testSet,dynamicSystem.parameters,dynamicSystem.config);
 % [x,currentTestForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,...
 %     zeros(dynamicSystem.config.nStates,dataSet.testSet.nNodes),dataSet.testSet,dynamicSystem.parameters,dynamicSystem.config);
-[x,currentTestForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,...
-    sparse(dynamicSystem.config.nStates,dataSet.testSet.nNodes),'testSet',0);
+for i = 1:dynamicSystem.ntrans
+    [x{i},currentTestForwardState(i)]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,sparse(dynamicSystem.config.nStates,dataSet.testSet.nNodes),'testSet',0,i);
+end
+% [x,currentTestForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,sparse(dynamicSystem.config.nStates,dataSet.testSet.nNodes),'testSet',0);
 % [testing.current.testSet.error,currentTestOutState]=feval(dynamicSystem.config.computeErrorFunction,x,dataSet.testSet,...
 %     dynamicSystem.parameters,dynamicSystem.config);
 [testing.current.testSet.error,currentTestOutState]=feval(dynamicSystem.config.computeErrorFunction,'testSet',x,0);
@@ -80,8 +88,10 @@ testing.current.testSet.forwardState=currentTestForwardState;
 % [x,testForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,
 %     zeros(dynamicSystem.config.nStates,dataSet.testSet.nNodes),dataSet.testSet,...
 %     learning.current.optimalParameters,dynamicSystem.config);
-[x,testForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,sparse(dynamicSystem.config.nStates,dataSet.testSet.nNodes),...
-    'testSet',1);
+for nt = 1:dynamicSystem.ntrans
+    [x{nt},testForwardState(nt)]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,sparse(dynamicSystem.config.nStates,dataSet.testSet.nNodes),...
+    'testSet',1,nt);
+end
 % [testing.optimal.testSet.error,testOutState]=feval(dynamicSystem.config.computeErrorFunction,x,dataSet.testSet,...
 %     learning.current.optimalParameters,dynamicSystem.config);
 [testing.optimal.testSet.error,testOutState]=feval(dynamicSystem.config.computeErrorFunction,'testSet',x,1);

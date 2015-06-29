@@ -167,13 +167,17 @@ addpath(genpath(pwd));
         dynamicSystem.config.nOuts=size(dataSet.trainSet.targets,1);
     end
     % TODO: isn't it better to initialize with random values?
-    dynamicSystem.state{1}=zeros(dynamicSystem.config.nStates,dataSet.trainSet.nNodes);
-    dynamicSystem.state{2}=zeros(dynamicSystem.config.nStates,dataSet.trainSet.nNodes);
+    for nt = 1:dynamicSystem.ntrans
+        dynamicSystem.state{nt}=zeros(dynamicSystem.config.nStates,dataSet.trainSet.nNodes);
+    end
     learning.current.bestErrorOnValidation=realmax;
     learning.current.nSteps=1;
+    learning.current.validationFail = 0;
     if dynamicSystem.config.useValidation
         learning.history.validationErrorHistory=[];
-        learning.current.validationState=zeros(dynamicSystem.config.nStates,dataSet.validationSet.nNodes);
+        for nt = 1:dynamicSystem.ntrans
+            learning.current.validationState{nt}=zeros(dynamicSystem.config.nStates,dataSet.validationSet.nNodes);
+        end
     end
     learning.history.oldX=dynamicSystem.state;
 
@@ -346,6 +350,16 @@ try
             err(n,'<type> is the first parameter that should be set');
         end
         switch name
+            case 'ntrans'
+                value = str2double(value);
+                if value < 1 
+                     err(n,'ntrans should be a positive integer');
+                end
+                dynamicSystem.ntrans = value;
+            case 'max_fail' %TODO: it should go to the learning section
+                value = str2double(value);
+                dynamicSystem.config.max_fail = value;
+                dynamicSystem.config.terminateOnValidation = 1;
             case 'type'
                 if ~isempty(strfind(value,'linear'))
                     model(2) = 1;
