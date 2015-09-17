@@ -37,7 +37,8 @@ function learn_
 % Main learning function (private)
 
 warning off MATLAB:divideByZero         % no divideByZero warning
-
+%FIXME
+% global transitionNetTrain outNetTrain
 global dataSet dynamicSystem learning VisualMode stopLearn toolHandles GUI
 if isempty(VisualMode)
     VisualMode = 0;
@@ -71,7 +72,7 @@ max_fail = dynamicSystem.config.max_fail;
 % learning.current.validationFail = 0;
 % MAIN LEARNING CYCLE
 while ( (learning.current.nSteps<iStart+learning.config.learningSteps && isempty(stopLearn)) &&...
-        ( ( terminateOnValidation == 1) && (learning.current.validationFail < max_fail)))
+        ( ( terminateOnValidation == true) && (learning.current.validationFail < max_fail)))
 
     % COMPUTING THE NEW STABLE STATE x=dynamicSystem.state;
     for i = 1:dynamicSystem.ntrans
@@ -129,8 +130,18 @@ while ( (learning.current.nSteps<iStart+learning.config.learningSteps && isempty
     learning.history.oldP=dynamicSystem.parameters;
 
     %% Computing the gradient
-    [learning.current.outGradient,deltaX]=feval(dynamicSystem.config.computeDeltaErrorFunction,[]);
-    [learning.current.forwardGradient,~,learning.current.backwardIt]=feval(dynamicSystem.config.backwardFunction,deltaX,[],[]);
+    % Backpropagate through G
+    % 1st output gives the gradient of cost w.r.t the parameters of G. 2nd
+    % output gives the grad of cost w.r.t the states injected to G
+    % (nStates*ntrans) x nTotalNodes
+    % In other words, 1st output is de/dw for w's in G. The 2nd input is
+    % variable b in TABLE I (de/do * dG/dx)
+    [learning.current.outGradient,b]=feval(dynamicSystem.config.computeDeltaErrorFunction,[]);
+    
+    % Backpropagation through F
+    % 1st output contains the gradient of cost w.r.t the parameters of F
+    % block(s)
+    [learning.current.forwardGradient,~,learning.current.backwardIt]=feval(dynamicSystem.config.backwardFunction,b,[],[]);
     
     % -- Data Logging --
     if dynamicSystem.config.saveIterationHistory
@@ -234,7 +245,7 @@ while ( (learning.current.nSteps<iStart+learning.config.learningSteps && isempty
             
         end
 
-        if VisualMode,
+        if VisualMode == 1,
             if ~isempty(toolHandles) && ishandle(toolHandles.ConfigToolFig) && strcmp(get(toolHandles.ConfigToolFig,'Visible'),'on')
                 set(toolHandles.ConfigToolFig,'Visible','off');
             end
@@ -244,7 +255,7 @@ while ( (learning.current.nSteps<iStart+learning.config.learningSteps && isempty
             percent=(round((learning.current.nSteps-iStart+1)/learning.config.learningSteps*100));
             DisplayResults('updatePlot',GUI.DisplayResultsH,[],fig_h,percent);
             drawnow;
-        else
+        elseif VisualMode == 2
             validation_str='current';
             marker='';
             mssg(['step: ' num2str(learning.current.nSteps) sprintf('\ttraining error: ') num2str(learning.current.trainError)])
@@ -286,7 +297,9 @@ while ( (learning.current.nSteps<iStart+learning.config.learningSteps && isempty
 
     %% Updating outNet weights.
     for it1=fieldnames(learning.current.outGradient)'
-        for it2=fieldnames(learning.current.outGradient.(char(it1)))'
+        IT = fieldnames(learning.current.outGradient.(char(it1)))';
+%         IT = IT(outNetTrain);
+        for it2=IT
             old4new=learning.current.outGradient.(char(it1)).(char(it2)) .* learning.current.rProp.oldGradient.(char(it1)).(char(it2));
             learning.current.rProp.delta.(char(it1)).(char(it2)) =...
                 (old4new>0) .* min(learning.config.rProp.deltaMax,learning.config.rProp.etaP * ...
@@ -318,7 +331,9 @@ while ( (learning.current.nSteps<iStart+learning.config.learningSteps && isempty
     end
     %% Updating transitionNet weights.
     for it3 = 1:dynamicSystem.ntrans;
-        for it2=fieldnames(learning.current.forwardGradient.transitionNet(it3))'
+        IT = fieldnames(learning.current.forwardGradient.transitionNet(it3))';
+%         IT = IT(transitionNetTrain);
+        for it2=IT
             old4new=learning.current.forwardGradient.transitionNet(it3).(char(it2)) .* ...
                 learning.current.rProp.oldGradient.transitionNet(it3).(char(it2));
             learning.current.rProp.delta.transitionNet(it3).(char(it2)) =...
@@ -358,7 +373,7 @@ while ( (learning.current.nSteps<iStart+learning.config.learningSteps && isempty
     learning.current.nSteps=learning.current.nSteps+1;
 end
 
-if VisualMode
+if VisualMode == 1
     DisplayResults('EnableUI',GUI.DisplayResultsH,[],guihandles(GUI.DisplayResultsH));
 end
 

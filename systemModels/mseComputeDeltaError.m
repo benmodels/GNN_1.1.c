@@ -14,5 +14,5 @@ else
     [gradient.outNet,dInputs]=feval(dynamicSystem.config.outNet.backwardFunction,dynamicSystem.parameters.outNet,...
         outState.outNetState,outState.delta);
 end
-        
+% Derivative w.r.t the states in the input of each node        
 dInputs=dInputs(1:sx,:);

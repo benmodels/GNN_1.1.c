@@ -5,14 +5,16 @@
 % its way onto private functions calling.
 
 
-function Configure(file)
+function Configure(file,configStruct)
 % USAGE: Configure(<file.config>)
 % Configure options for GNN
-
+if nargin<2
+    configStruct = struct();
+end
 addpath(genpath(pwd));
  try
     global model model_name learn learn_name general general_name dynamicSystem learning dataSet
-    if nargin ~= 1
+    if nargin < 1
         file='GNN.config';      %default config file
     end
     [fid,message] = fopen(file,'rt');
@@ -107,7 +109,7 @@ addpath(genpath(pwd));
             end
             name = line(1:k-1);
             value = line(k+1:end);
-            check_valueok(section,name,value,num2str(numline));
+            check_valueok(section,name,value,num2str(numline),configStruct);
         end
     end
     fclose(fid);
@@ -339,7 +341,7 @@ end
 
 
 % Check the correctness of the couple <parameter,value>
-function check_valueok(section,name,value,n)
+function check_valueok(section,name,value,n,configStruct)
 try
     if isempty(value)
         err(n,['No value specified for <' name '>']);
@@ -351,11 +353,15 @@ try
         end
         switch name
             case 'ntrans'
-                value = str2double(value);
-                if value < 1 
+                if isfield(configStruct,name)
+                    v=configStruct.(name);
+                else
+                    v = str2double(value);
+                end
+                if v < 1 
                      err(n,'ntrans should be a positive integer');
                 end
-                dynamicSystem.ntrans = value;
+                dynamicSystem.ntrans = v;
             case 'max_fail' %TODO: it should go to the learning section
                 value = str2double(value);
                 dynamicSystem.config.max_fail = value;
@@ -371,14 +377,22 @@ try
                     err(n,'Unsupported model type');
                 end
             case 'nStates'
-                v=str2double(value);
+                if isfield(configStruct,name)
+                    v=configStruct.(name);
+                else
+                    v=str2double(value);
+                end
                 if ~isempty(findstr(value,',')) || (~isempty(findstr(value,'.'))) || isnan(v) || (v<=0)
                     err(n,['Parameter <' name '> should be a positive integer. Check "' value '"']);return;
                 end
                 dynamicSystem.config.nStates=v;
                 model(3)=1;
             case 'transitionNet.nLayers'
-                v=str2double(value);
+                if isfield(configStruct,'transitionNetnLayers') 
+                    v=configStruct.transitionNetnLayers;
+                else
+                    v=str2double(value);
+                end
                 if v~=1 && v~=2
                     err(n,['Parameter <' name '> should be 1 or 2. Check "' value '"']);return;
                 end
@@ -394,7 +408,11 @@ try
                 end
                 model(5)=1;
             case 'transitionNet.nHiddens'
-                v=str2double(value);
+                if isfield(configStruct,'transitionNetnHiddens')
+                    v = configStruct.transitionNetnHiddens;
+                else
+                    v=str2double(value);
+                end
                 if ~isempty(findstr(value,',')) || (~isempty(findstr(value,'.'))) || isnan(v) || (v<1)
                     err(n,['Parameter <' name '> should be an integer greater than 1. Check "' value '"']);return;
                 end
@@ -450,7 +468,11 @@ try
                 dynamicSystem.config.forcingNet.weightRange=v;
                 model(11)=1;
             case 'outNet.nLayers'
-                v=str2double(value);
+                if isfield(configStruct, 'outNetnLayers')
+                    v = configStruct.outNetnLayers;
+                else
+                    v=str2double(value);
+                end
                 if v~=1 && v~=2
                     err(n,['Parameter <' name '> should be 1 or 2. Check "' value '"']);return;
                 end
@@ -466,7 +488,11 @@ try
                 end
                 model(13)=1;
             case 'outNet.nHiddens'
-                v=str2double(value);
+                if isfield(configStruct,'outNetnHiddens')
+                    v = configStruct.outNetnHiddens;
+                else
+                    v=str2double(value);
+                end
                 if ~isempty(findstr(value,',')) || (~isempty(findstr(value,'.'))) || isnan(v) || (v<1)
                     err(n,['Parameter <' name '> should be an integer greater than 1. Check "' value '"']);return;
                 end

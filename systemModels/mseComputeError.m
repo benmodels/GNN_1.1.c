@@ -32,14 +32,6 @@ outState.outNetState=feval(dynamicSystem.config.outNet.forwardFunction,in,'outNe
 %% "maksMatrix" allows to select the supervised outputs
 outState.delta=(outState.outNetState.outs-dataSet.(dataset).targets)*dataSet.(dataset).maskMatrix; % sarebbe maskMatrix' ma e' simmetrica
 
-if size(outState.delta,1)>1
-    % multiclass problem: the error is summed over all the components
-    e=0;
-    for (i=1:size(outState.delta,1))
-        e = e+outState.delta(i,:)*outState.delta(i,:)'/2;
-    end
-else
-    e=outState.delta *outState.delta'/2;
-end
-
+% multiclass problem: the error is summed over all the components
+e=sum(outState.delta(:).^2)/2;
 

@@ -18,10 +18,10 @@ global dynamicSystem learning
 %% 2nd version (new parameters)
 sx=size(x,2);
 if ~optimalParam
-    netState.hiddens=tanh(dynamicSystem.parameters.(net)(n).weights1*x+repmat(dynamicSystem.parameters.(net)(n).bias1, [1 sx]));
+    netState.hiddens = tansig(dynamicSystem.parameters.(net)(n).weights1*x+repmat(dynamicSystem.parameters.(net)(n).bias1, [1 sx]));
     netState.outs=dynamicSystem.parameters.(net)(n).weights2*netState.hiddens+repmat(dynamicSystem.parameters.(net)(n).bias2, [1 sx]);
 else
-    netState.hiddens=tanh(learning.current.optimalParameters.(net)(n).weights1*x+repmat(learning.current.optimalParameters.(net)(n).bias1, [1 sx]));
+    netState.hiddens=tansig(learning.current.optimalParameters.(net)(n).weights1*x+repmat(learning.current.optimalParameters.(net)(n).bias1, [1 sx]));
     netState.outs=learning.current.optimalParameters.(net)(n).weights2*netState.hiddens+repmat(learning.current.optimalParameters.(net)(n).bias2, [1 sx]);
 end
 netState.inputs=x;

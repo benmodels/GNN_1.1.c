@@ -24,7 +24,8 @@ supervisedNodesNumberTest=size(supervisedNodesTest,1);
 
 
 
-%evaluating current parameters on trainset
+%% Evaluating current parameters on trainset
+
 % [x,currentTrainForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state,dataSet.trainSet...
 %     ,dynamicSystem.parameters,dynamicSystem.config);
 for nt = 1:dynamicSystem.ntrans
@@ -34,7 +35,13 @@ end
 % [testing.current.trainSet.error,currentTrainOutState]=feval(dynamicSystem.config.computeErrorFunction,x,dataSet.trainSet,...
 %     dynamicSystem.parameters,dynamicSystem.config);
 [testing.current.trainSet.error,currentTrainOutState]=feval(dynamicSystem.config.computeErrorFunction,'trainSet',x,0);
-testing.current.trainSet.maxRelativeError=max(abs(currentTrainOutState.delta(supervisedNodesTrain) ./ dataSet.trainSet.targets(supervisedNodesTrain)));
+outError = currentTrainOutState.delta(:,supervisedNodesTrain);
+targets = dataSet.trainSet.targets(:,supervisedNodesTrain);
+% testing.current.trainSet.errorAll = outError;
+testing.current.trainSet.relativeError = abs(outError ./ targets);
+testing.current.trainSet.maxRelativeError=max(testing.current.trainSet.relativeError(:));
+% FIXME: all following expressions are wrong since they do not consider the
+% case that the targets are multi-dimensional. i.e. they should contain delta(:,supervisedNodesTrain)
 testing.current.trainSet.acc5percent=size(find(abs(currentTrainOutState.delta(supervisedNodesTrain)) ./ dataSet.trainSet.targets(supervisedNodesTrain)<0.05),2)/supervisedNodesNumberTrain;
 testing.current.trainSet.acc10percent=size(find(abs(currentTrainOutState.delta(supervisedNodesTrain)) ./ dataSet.trainSet.targets(supervisedNodesTrain)<0.1),2)/supervisedNodesNumberTrain;
 testing.current.trainSet.maxError=max(abs(currentTrainOutState.delta(supervisedNodesTrain)));
@@ -44,7 +51,8 @@ testing.current.trainSet.outState=currentTrainOutState;
 testing.current.trainSet.forwardState=currentTrainForwardState;
 
 
-%evaluating optimal parameters on trainset
+%% Evaluating optimal parameters on trainset
+
 % [x,trainForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,dynamicSystem.state,dataSet.trainSet,...
 %     learning.current.optimalParameters,dynamicSystem.config);
 for i = 1:dynamicSystem.ntrans
@@ -54,6 +62,10 @@ end
 % [testing.optimal.trainSet.error,trainOutState]=feval(dynamicSystem.config.computeErrorFunction,x,dataSet.trainSet,...
 %     learning.current.optimalParameters,dynamicSystem.config);
 [testing.optimal.trainSet.error,trainOutState]=feval(dynamicSystem.config.computeErrorFunction,'trainSet',x,1);
+outError = trainOutState.delta(:,supervisedNodesTrain);
+targets = dataSet.trainSet.targets(:,supervisedNodesTrain);
+% testing.optimal.trainSet.errorAll = outError;
+testing.optimal.trainSet.relativeError = abs(outError ./ targets);
 testing.optimal.trainSet.maxRelativeError=max(abs(trainOutState.delta(supervisedNodesTrain) ./ dataSet.trainSet.targets(supervisedNodesTrain)));
 testing.optimal.trainSet.acc5percent=size(find(abs(trainOutState.delta(supervisedNodesTrain)) ./ dataSet.trainSet.targets(supervisedNodesTrain)<0.05),2)/supervisedNodesNumberTrain;
 testing.optimal.trainSet.acc10percent=size(find(abs(trainOutState.delta(supervisedNodesTrain)) ./ dataSet.trainSet.targets(supervisedNodesTrain)<0.1),2)/supervisedNodesNumberTrain;
@@ -63,7 +75,9 @@ testing.optimal.trainSet.out=trainOutState.outNetState.outs;
 testing.optimal.trainSet.outState=trainOutState;
 testing.optimal.trainSet.forwardState=trainForwardState;
 
-%evaluating current parameters on testset
+
+%% Evaluating current parameters on testset
+
 % [x,currentTestForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,...
 %     zeros(dynamicSystem.config.nStates,dataSet.testSet.nNodes),dataSet.testSet,dynamicSystem.parameters,dynamicSystem.config);
 % [x,currentTestForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,...
@@ -75,6 +89,10 @@ end
 % [testing.current.testSet.error,currentTestOutState]=feval(dynamicSystem.config.computeErrorFunction,x,dataSet.testSet,...
 %     dynamicSystem.parameters,dynamicSystem.config);
 [testing.current.testSet.error,currentTestOutState]=feval(dynamicSystem.config.computeErrorFunction,'testSet',x,0);
+outError = currentTestOutState.delta(:,supervisedNodesTest);
+targets = dataSet.testSet.targets(:,supervisedNodesTest);
+testing.current.testSet.errorAll = outError;
+testing.current.testSet.relativeError = abs(outError ./ targets);
 testing.current.testSet.maxRelativeError=max(abs(currentTestOutState.delta(supervisedNodesTest) ./ dataSet.testSet.targets(supervisedNodesTest)));
 testing.current.testSet.acc5percent=size(find(abs(currentTestOutState.delta(supervisedNodesTest)) ./ dataSet.testSet.targets(supervisedNodesTest)<0.05),2)/supervisedNodesNumberTest;
 testing.current.testSet.acc10percent=size(find(abs(currentTestOutState.delta(supervisedNodesTest)) ./ dataSet.testSet.targets(supervisedNodesTest)<0.1),2)/supervisedNodesNumberTest;
@@ -84,7 +102,9 @@ testing.current.testSet.out=currentTestOutState.outNetState.outs;
 testing.current.testSet.outState=currentTestOutState;
 testing.current.testSet.forwardState=currentTestForwardState;
 
-%evaluating optimal parameters on testset
+
+%% Evaluating optimal parameters on testset
+
 % [x,testForwardState]=feval(dynamicSystem.config.forwardFunction,dataSet.testSet.forwardSteps,
 %     zeros(dynamicSystem.config.nStates,dataSet.testSet.nNodes),dataSet.testSet,...
 %     learning.current.optimalParameters,dynamicSystem.config);
@@ -95,6 +115,10 @@ end
 % [testing.optimal.testSet.error,testOutState]=feval(dynamicSystem.config.computeErrorFunction,x,dataSet.testSet,...
 %     learning.current.optimalParameters,dynamicSystem.config);
 [testing.optimal.testSet.error,testOutState]=feval(dynamicSystem.config.computeErrorFunction,'testSet',x,1);
+outError = testOutState.delta(:,supervisedNodesTest);
+targets = dataSet.testSet.targets(:,supervisedNodesTest);
+testing.optimal.testSet.errorAll = outError;
+testing.optimal.testSet.relativeError = abs(outError ./ targets);
 testing.optimal.testSet.maxRelativeError=max(abs(testOutState.delta(supervisedNodesTest) ./ dataSet.testSet.targets(supervisedNodesTest)));
 testing.optimal.testSet.acc5percent=size(find(abs(testOutState.delta(supervisedNodesTest)) ./ dataSet.testSet.targets(supervisedNodesTest)<0.05),2)/supervisedNodesNumberTest;
 testing.optimal.testSet.acc10percent=size(find(abs(testOutState.delta(supervisedNodesTest)) ./ dataSet.testSet.targets(supervisedNodesTest)<0.1),2)/supervisedNodesNumberTest;
@@ -104,14 +128,15 @@ testing.optimal.testSet.out=testOutState.outNetState.outs;
 testing.optimal.testSet.outState=testOutState;
 testing.optimal.testSet.forwardState=testForwardState;
 
-% displays results
+
+%% Displays results
 global VisualMode
 if VisualMode == 1
     TestFigH=DisplayTestR(testing.current.trainSet.error,testing.current.trainSet.acc5percent,testing.current.trainSet.acc10percent,...
         testing.optimal.trainSet.error,testing.optimal.trainSet.acc5percent,testing.optimal.trainSet.acc10percent,...
         testing.current.testSet.error,testing.current.testSet.acc5percent,testing.current.testSet.acc10percent,...
         testing.optimal.testSet.error,testing.optimal.testSet.acc5percent,testing.optimal.testSet.acc10percent);
-else
+elseif VisualMode == 2
     mssg(sprintf('\n\t\t\tTESTSET\t\t\t\t\tTRAINSET'));
     mssg(sprintf('--------------------------------------------------------------------------------------'));
     mssg([sprintf('\t\t| Error: \t\t') num2str(testing.optimal.testSet.error,'%10.5g') sprintf('\t\tError: \t\t\t') num2str(testing.optimal.trainSet.error,'%10.5g')]);
