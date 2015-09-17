@@ -10,12 +10,14 @@ if learning.current.nSteps == 1
 end
 if ~isfield(intmp,dataset)
     if (isfield(dynamicSystem.config,'useLabelledEdges') && (dynamicSystem.config.useLabelledEdges==1))
-        labels=[dataSet.(dataset).nodeLabels(:,dataSet.(dataset).neuralModel.childOfArc);dataSet.(dataset).nodeLabels(:,dataSet.(dataset).neuralModel.fatherOfArc);dataSet.(dataset).edgeLabels];
-        
+        labels=[dataSet.(dataset).nodeLabels(:,dataSet.(dataset).neuralModel.childOfArc);
+                dataSet.(dataset).nodeLabels(:,dataSet.(dataset).neuralModel.fatherOfArc);
+                dataSet.(dataset).edgeLabels];
     else
         fatheridx.(dataset) = dataSet.(dataset).neuralModel.fatherOfArc;
         childidx.(dataset) = dataSet.(dataset).neuralModel.childOfArc;
-        labels=[dataSet.(dataset).nodeLabels(:,childidx.(dataset));dataSet.(dataset).nodeLabels(:,fatheridx.(dataset))];
+        labels=[dataSet.(dataset).nodeLabels(:,childidx.(dataset));
+                dataSet.(dataset).nodeLabels(:,fatheridx.(dataset))];
         r2 = size(labels,1);
         c = size(labels,2);
         intmp.(dataset) = zeros(r1+r2, c);
